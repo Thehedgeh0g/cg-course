@@ -5,9 +5,26 @@
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>1.1</title>
+		<link rel="stylesheet" href="/canvas.css" />
 	</head>
-	<body>
-		<canvas id="canvas" width="800" height="600"></canvas>
+	<body style="margin: 0">
+		<div
+			style="
+				background: black;
+				padding: 0;
+				height: 100vh;
+				display: flex;
+				align-items: center;
+			"
+		>
+			<canvas
+				id="canvas"
+				width="800"
+				height="600"
+				class="neon-border"
+				style="padding: 0"
+			></canvas>
+		</div>
 		<script type="module" src="/src/main.ts"></script>
 	</body>
 </html>
