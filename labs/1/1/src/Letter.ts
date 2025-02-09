@@ -18,7 +18,7 @@ export class Letter {
 			this.startTime = currentTime;
 		}
 		let frame = (currentTime - this.startTime) / Letter.FRAME_DURATION;
-		let frameOffset = (Math.PI / 4) * this.animationOffset;
+		let frameOffset = (Math.PI / 3) * this.animationOffset;
 		let y = Math.cos((frame % (Math.PI * 2)) + frameOffset) + this.startY;
 
 		this.startY = y;
