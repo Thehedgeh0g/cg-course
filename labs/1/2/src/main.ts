@@ -38,7 +38,7 @@ function main(): void {
 		new RectWindowComponent(60, 60, 270, 350),
 		new RectWindowComponent(60, 60, 470, 350),
 		new DoorComponent(100, 60, 370, 400),
-		new FenceComponent(800, 0, 500)
+		new FenceComponent(800, 0, 500),
 	];
 
 	components.forEach((component) => component.draw(ctx));
