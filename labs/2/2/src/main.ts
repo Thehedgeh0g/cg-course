@@ -6,11 +6,12 @@ function main(): void {
 	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 	if (canvas) {
-		const document = new ImageDocument();
+		const document = new ImageDocument(800, 600);
 		const view = new ImageView(
 			window.innerWidth,
 			window.innerHeight,
 			canvas,
+			document,
 		);
 		document.addObserver(view);
 		new ImageController(document, view);
