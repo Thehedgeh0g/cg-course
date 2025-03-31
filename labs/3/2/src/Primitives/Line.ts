@@ -1,34 +1,17 @@
-import * as THREE from "three";
-import { Line2 } from "three/examples/jsm/lines/Line2.js";
-import {Point} from "../Common/Common";
-import {LineMaterial} from "three/examples/jsm/lines/LineMaterial";
-import {LineGeometry} from "three/examples/jsm/lines/LineGeometry";
+import {Shape} from "../Common/Shape";
+import {WebGLRenderer} from "../Common/WebGLRenderer";
 
-export class Line {
-	public line: Line2;
+export class Line extends Shape {
+    private length: number
 
-	constructor(start: Point, end: Point, color: number = 0x0000ff, thickness: number = 3) {
-		const geometry = new LineGeometry();
-		geometry.setPositions([start.x, start.y, 0, end.x, end.y, 0]);
-
-		const material = new LineMaterial({
-			color: color,
-			linewidth: thickness,
-			resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
-		});
-
-		this.line = new Line2(geometry, material);
-		this.line.computeLineDistances();
+    constructor(x1: number, y1: number, length: number) {
+        super(x1, y1);
+		this.length = length
 	}
 
-	public Update(start: Point, end: Point) {
-		this.line.geometry.setFromPoints([
-			new THREE.Vector3(start.x, start.y, 0),
-			new THREE.Vector3(end.x, end.y, 0),
-		]);
-	}
-
-	public AddToScene(scene: THREE.Scene) {
-		scene.add(this.line);
-	}
+    draw(renderer: WebGLRenderer, color: [number, number, number, number]) {
+        const [rx1, ry1] = this.rotatePoint(this.x, this.y);
+        const [rx2, ry2] = this.rotatePoint(this.x + length, this.y + length);
+        renderer.drawShape([rx1, ry1, rx2, ry2], color);
+    }
 }

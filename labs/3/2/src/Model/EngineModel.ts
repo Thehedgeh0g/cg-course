@@ -21,7 +21,7 @@ export class EngineModel {
 		let rodEndPos = {x: carterPos.x, y: carterPos.y + rodLength};
 		this.crankshaft = new CrankshaftModel(crankshaftRadius, startRpm);
 		this.rod = new RodModel(
-			carterPos,
+			{x: carterPos.x, y:carterPos.y},
 			rodEndPos,
 			rodLength,
 			crankshaftRadius,

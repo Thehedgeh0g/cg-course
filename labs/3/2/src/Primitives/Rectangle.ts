@@ -1,34 +1,21 @@
-import * as THREE from "three";
-import { Point } from "../Common/Common";
+import {Shape} from "../Common/Shape";
+import {WebGLRenderer} from "../Common/WebGLRenderer";
 
-export class Rectangle {
-	public rectangle: THREE.Mesh;
-
-	constructor(center: Point, width: number, height: number, color: number = 0x0000ff) {
-		const geometry = new THREE.PlaneGeometry(width, height);
-		const material = new THREE.MeshBasicMaterial({
-			color: color,
-			side: THREE.DoubleSide
-		});
-
-		this.rectangle = new THREE.Mesh(geometry, material);
-		this.UpdateCenter(center);
+export class Rectangle extends Shape {
+	constructor(x: number, y: number, private width: number, private height: number) {
+		super(x, y);
 	}
 
-	public UpdateCenter(center: Point) {
-		this.rectangle.position.set(center.x, center.y, 0);
-	}
+	draw(renderer: WebGLRenderer, color: [number, number, number, number]) {
+		const corners = [
+			[this.x, this.y],
+			[this.x + this.width, this.y],
+			[this.x, this.y + this.height],
+			[this.x + this.width, this.y],
+			[this.x + this.width, this.y + this.height],
+			[this.x, this.y + this.height]
+		].map(([px, py]) => this.rotatePoint(px, py)).flat();
 
-	public UpdateSize(width: number, height: number) {
-		this.rectangle.geometry.dispose();
-		this.rectangle.geometry = new THREE.PlaneGeometry(width, height);
-	}
-
-	public Rotate(angle: number) {
-		this.rectangle.rotation.z = angle;
-	}
-
-	public AddToScene(scene: THREE.Scene) {
-		scene.add(this.rectangle);
+		renderer.drawShape(corners, color);
 	}
 }

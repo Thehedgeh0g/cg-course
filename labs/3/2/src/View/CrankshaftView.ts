@@ -1,31 +1,35 @@
 import {Circle} from "../Primitives/Circle";
 import {Rectangle} from "../Primitives/Rectangle";
 import {Point} from "../Common/Common";
-import {Scene} from "three";
+import {WebGLRenderer} from "../Common/WebGLRenderer";
+import {c} from "vite/dist/node/moduleRunnerTransport.d-CXw_Ws6P";
 
 export class CrankshaftView {
     private circle: Circle
     private rectangle: Rectangle
     private radius: number
+    private context: WebGLRenderer
+    private center: Point
+    private prevAngle: number
 
-    constructor(center: Point, radius: number, angle: number) {
+    constructor(context: WebGLRenderer, center: Point, radius: number, angle: number) {
+        this.center = {x: center.x, y: center.y}
+        this.context = context
         this.radius = radius
-        this.circle = new Circle(center, this.radius, 0x808080)
-        let rectCenterX = Math.cos(angle+Math.PI/2)*this.radius
-        let rectCenterY = Math.sin(angle+Math.PI/2)*this.radius
-        this.rectangle = new Rectangle({x: rectCenterX, y: rectCenterY}, this.radius, this.radius/2, 0x808080)
-        this.rectangle.Rotate(angle)
+        this.circle = new Circle(center.x, center.y, radius)
+        this.rectangle = new Rectangle(center.x+this.radius/2, center.y+this.radius/4, this.radius, this.radius/2)
     }
 
     public Update(newAngle: number) {
-        let rectCenterX = Math.cos(newAngle+Math.PI/2)*this.radius
-        let rectCenterY = Math.sin(newAngle+Math.PI/2)*this.radius
-        this.rectangle.UpdateCenter({x: rectCenterX, y: rectCenterY})
-        this.rectangle.Rotate(newAngle)
+        let rectCenterX = this.center.x + Math.cos(newAngle+Math.PI/2)*this.radius
+        let rectCenterY = this.center.y + Math.sin(newAngle+Math.PI/2)*this.radius
+        this.rectangle.rotate(newAngle)
+        this.prevAngle = newAngle
+        this.rectangle.setPosition(rectCenterX, rectCenterY)
     }
 
-    public AddToScene(scene: Scene) {
-        this.rectangle.AddToScene(scene)
-        this.circle.AddToScene(scene)
+    public Draw() {
+        this.rectangle.draw(this.context, [0.5, 0.5, 0.5, 1])
+        this.circle.draw(this.context, [0.5, 0.5, 0.5, 1])
     }
 }

@@ -12,8 +12,8 @@ export class RodModel {
 		length: number,
 		crankshaftRadius: number,
 	) {
-		this.rodStart = start;
-		this.rodEnd = end;
+		this.rodStart = {x: start.x, y: start.y};
+		this.rodEnd = {x: end.x, y: end.y};
 		this.length = length;
 		this.crankshaftRadius = crankshaftRadius;
 	}

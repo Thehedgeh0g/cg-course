@@ -1,35 +1,21 @@
-import * as THREE from "three";
-import {Point} from "../Common/Common";
-import {Color} from "three";
+import {Shape} from "../Common/Shape";
+import {WebGLRenderer} from "../Common/WebGLRenderer";
 
-export class Circle {
-    public circle: THREE.Mesh;
-
-    constructor(center: Point, radius: number, color: number = 0x0000ff) {
-        const geometry = new THREE.CircleGeometry(radius, 32);
-
-        const material = new THREE.MeshBasicMaterial({
-            color: color,
-            side: THREE.DoubleSide,
-        });
-
-        this.circle = new THREE.Mesh(geometry, material);
-
-        this.circle.position.set(center.x, center.y, 0);
+export class Circle extends Shape {
+    constructor(cx: number, cy: number, private radius: number) {
+        super(cx, cy);
     }
 
-    public UpdateCenter(center: Point) {
-        this.circle.position.set(center.x, center.y, 0);
-    }
-
-    public UpdateRadius(radius: number) {
-        const geometry = new THREE.CircleGeometry(radius, 32);
-
-        this.circle.geometry.dispose();
-        this.circle.geometry = geometry;
-    }
-
-    public AddToScene(scene: THREE.Scene) {
-        scene.add(this.circle);
+    draw(renderer: WebGLRenderer, color: [number, number, number, number]) {
+        const segments = 30;
+        const vertices = [];
+        for (let i = 0; i < segments; i++) {
+            const theta = (i / segments) * Math.PI * 2;
+            const x = this.x + this.radius * Math.cos(theta);
+            const y = this.y + this.radius * Math.sin(theta);
+            const [rx, ry] = this.rotatePoint(x, y);
+            vertices.push(rx, ry);
+        }
+        renderer.drawShape(vertices, color);
     }
 }

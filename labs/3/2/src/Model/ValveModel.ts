@@ -28,8 +28,6 @@ export class ValveModel {
 
 	public Update(crankshaftAngle: number, crankshaftSpeed: number) {
 		let inCycleAngle = crankshaftAngle % (4*Math.PI) - Math.PI/2
-		console.log(inCycleAngle)
-		console.log(Math.PI/2)
 		if ((Math.PI/2 < inCycleAngle) && (inCycleAngle <= Math.PI))
 		{
 			this.valveStart.x += Math.cos(this.angle)*(this.valveStart.x+crankshaftSpeed/100)/1000
