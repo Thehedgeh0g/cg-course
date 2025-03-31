@@ -83,7 +83,7 @@ class IcosaDodecahedron extends BaseShape {
         if (indices.length === 0) {
             console.error("Error: Index buffer is empty!");
         }
-
+        this.vertexCount = indices.length
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
         return indexBuffer;
     }

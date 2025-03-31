@@ -44,7 +44,7 @@ export class SceneManager {
             let diffTime = (currentTime - (this.startTime ?? currentTime))
 
             this.lastFrameTime = currentTime;
-            this.shape.render(diffTime/1060000);
+            this.shape.render(diffTime/1600);
         }
 
         setTimeout(() => this.animate(), SceneManager.FRAME_DURATION);

@@ -19,22 +19,16 @@ export class ObjParser {
             switch (parts[0]) {
                 case 'v':
                     const vertex = parts.slice(1).map(Number);
-                    vertexMap.push(vertex);
+                    this.vertices.push(...vertex);
                     break;
                 case 'f':
                     const face = parts.slice(1).map(p => parseInt(p) - 1);
                     faceMap.push(face);
                     this.indices.push(...face)
+                    this.colors.push(...[Math.random(), Math.random(), Math.random(), 1]);
                     break;
             }
         }
-
-        for (const indexRow of faceMap) {
-            for (const index of indexRow) {
-                this.vertices.push(...vertexMap[index])
-            }
-        }
-        this.colors.push(...[Math.random(), Math.random(), Math.random(), 0.5]);
         console.log(this.colors)
         console.log(this.indices)
         console.log(this.vertices)
