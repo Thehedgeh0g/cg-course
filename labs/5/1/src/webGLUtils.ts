@@ -1,19 +1,37 @@
 const vertexShaderSource = `
-  attribute vec3 a_position;
-  uniform mat4 u_matrix;
-
-  void main() {
-    gl_Position = u_matrix * vec4(a_position, 1.0);
-  }
+    attribute vec3 a_position;
+    attribute vec2 a_texcoord;
+    
+    varying vec2 v_texcoord;
+    uniform mat4 u_matrix;
+    
+    void main() {
+        // Всегда добавляйте .0 к целым числам в GLSL
+        gl_Position = u_matrix * vec4(a_position, 1.0);
+        
+        // Переворачиваем текстуру по вертикали (если требуется)
+        v_texcoord = vec2(a_texcoord.x, 1.0 - a_texcoord.y);
+    }
 `
 
 const fragmentShaderSource = `
-  precision mediump float;
-  uniform vec4 u_color;
-  
-  void main() {
-    gl_FragColor = u_color;
-  }
+    precision mediump float; // Должно быть в первой строке
+    
+    varying vec2 v_texcoord;
+    uniform sampler2D u_texture;
+    uniform vec4 u_color;
+    
+    void main() {
+        vec4 texColor = texture2D(u_texture, v_texcoord);
+        
+        // Комбинируем цвет текстуры с uniform цветом
+        gl_FragColor = texColor * u_color;
+        
+        // Для отладки: если альфа = 0, показываем красный
+        if(gl_FragColor.a < 0.01) {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }
+    }
 `
 
 export const createShaderProgram = (gl: WebGLRenderingContext): WebGLProgram => {
@@ -34,6 +52,36 @@ export const createShaderProgram = (gl: WebGLRenderingContext): WebGLProgram => 
     return program
 }
 
+export const loadTexture = (
+    gl: WebGLRenderingContext,
+    url: string,
+    callback: (texture: WebGLTexture) => void
+): WebGLTexture => {
+    const texture = gl.createTexture();
+    if (!texture) throw new Error('Не удалось создать текстуру');
+
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+
+    image.onload = () => {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+        } else {
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+
+        callback(texture);
+    };
+
+    image.src = url;
+    return texture;
+};
+
 const compileShader = (gl: WebGLRenderingContext, type: number, source: string): WebGLShader => {
     const shader = gl.createShader(type)
     if (!shader) {
@@ -48,3 +96,5 @@ const compileShader = (gl: WebGLRenderingContext, type: number, source: string):
     }
     return shader
 }
+
+const isPowerOf2 = (value: number): boolean => (value & (value - 1)) === 0;

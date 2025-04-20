@@ -46,6 +46,12 @@ export class Labyrinth {
         return this.map[mapZ]?.[mapX] === 1
     }
 
+    public getTextureIndex(x: number, z: number): number {
+        const n = this.getSize(); // допустим, 5
+        const value = Math.floor(((x + z) / (2 * (n - 1))) * 5); // 0..4
+        return Math.min(value, 4); // на всякий случай
+    }
+
     private generateRandomMatrix(N: number): number[][] {
         const matrix: number[][] = [];
 

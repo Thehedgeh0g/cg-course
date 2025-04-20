@@ -30,12 +30,12 @@ class Application {
         gl.useProgram(this.program)
 
         const matrixLoc = gl.getUniformLocation(this.program, 'u_matrix')
-        const colorLoc = gl.getUniformLocation(this.program, 'u_color')
-        if (!matrixLoc || !colorLoc) throw new Error('Не удалось получить uniform-переменные')
+        const textureLoc = gl.getUniformLocation(this.program, 'u_texture')
+        if (!matrixLoc || !textureLoc) throw new Error('Не удалось получить uniform-переменные')
 
         this.labyrinth = new Labyrinth(null)
         this.player = new Player()
-        this.vLabyrinth = new LabyrinthView(this.labyrinth, this.gl, matrixLoc, colorLoc)
+        this.vLabyrinth = new LabyrinthView(this.labyrinth, this.gl, matrixLoc, textureLoc)
         this.cube = new Cube(this.gl, this.program)
         this.setupEventListeners()
     }
