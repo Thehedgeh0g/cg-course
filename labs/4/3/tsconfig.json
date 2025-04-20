@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    // Language and Environment
+    "target": "ES2021",
+    "lib": [
+      "ES2021",
+      "dom",
+      "dom.iterable",
+      "ES2021.String"
+    ],
+
+    // Completeness
+    "skipLibCheck": true,
+  },
+}
