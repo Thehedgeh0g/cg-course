@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "target": "es5",  // или ваш текущий target
+    "lib": ["es2019", "dom"]  // Добавляем es2019 или выше
+  }
+}
