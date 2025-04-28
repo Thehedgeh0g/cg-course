@@ -14,15 +14,15 @@ uniform vec2 u_center;
 void main() {
     float radius = 0.5;
     float thickness = 0.025;
-    vec2 c = u_center; // center сам объявляем здесь
+    vec2 c = u_center; 
     float dist = distance(c, gl_FragCoord.xy / 400.0);
 
     if (dist > radius - thickness && dist < radius + thickness) {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); // черная граница
+        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); 
     } else if (dist < radius) {
-        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); // белая заливка
+        gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
     } else {
-        discard; // убрать фрагменты вне круга
+        discard;
     }
 }
 `;
