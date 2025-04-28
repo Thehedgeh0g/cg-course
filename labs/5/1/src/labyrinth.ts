@@ -19,13 +19,11 @@ export class Labyrinth {
         [1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ]
+    private wallMap: number[][] = []
 
-    public constructor(size: number | null) {
-        if (size !== null){
-            this.size = size
-            this.map = this.generateRandomMatrix(this.size)
-        }
+    public constructor(wallTypeCount: number | null) {
         this.size = this.map.length
+        this.generateWallMatrix(wallTypeCount)
     }
 
     public getMap(): number[][] {
@@ -36,33 +34,42 @@ export class Labyrinth {
         return this.size
     }
 
-    public isWall(x: number, y: number, z: number): boolean {
-        if (Math.abs(y) > this.wallHeigth) {
-            return false
-        }
+    public isWall(x: number, z: number): boolean {
+        const buffer = 0.15;
 
-        const mapX = Math.floor(x)
-        const mapZ = Math.floor(z)
-        return this.map[mapZ]?.[mapX] === 1
+        const positions = [
+            [x + buffer, z],
+            [x - buffer, z],
+            [x, z + buffer],
+            [x, z - buffer],
+            [x + buffer, z + buffer],
+            [x - buffer, z - buffer],
+            [x + buffer, z - buffer],
+            [x - buffer, z + buffer]
+        ];
+
+        return positions.some(([checkX, checkZ]) => {
+            const gridX = Math.floor(checkX);
+            const gridZ = Math.floor(checkZ);
+            return this.map[gridZ]?.[gridX] !== 0;
+        });
     }
 
-    public getTextureIndex(x: number, z: number): number {
-        const n = this.getSize(); // допустим, 5
-        const value = Math.floor(((x + z) / (2 * (n - 1))) * 5); // 0..4
-        return Math.min(value, 4); // на всякий случай
+    public getTextureType(x: number, z: number): number {
+        return this.wallMap[x][z]
     }
 
-    private generateRandomMatrix(N: number): number[][] {
-        const matrix: number[][] = [];
+    private generateTextureType(textureTypesRange: number): number {
+        return Math.floor(Math.random() * textureTypesRange);
+    }
 
-        for (let i = 0; i < N; i++) {
+    private generateWallMatrix(textureTypesRange: number) {
+        for (let i = 0; i < this.size; i++) {
             const row: number[] = [];
-            for (let j = 0; j < N; j++) {
-                row.push(Math.random() < 0.5 ? 0 : 1);
+            for (let j = 0; j < this.size; j++) {
+                row.push(this.generateTextureType(textureTypesRange));
             }
-            matrix.push(row);
+            this.wallMap.push(row);
         }
-
-        return matrix;
     }
 }

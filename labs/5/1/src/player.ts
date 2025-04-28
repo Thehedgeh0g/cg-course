@@ -7,7 +7,7 @@ export class Player {
     public pitch: number
     speed: number
     rotationSpeed: number
-    y: number = 2.5
+    y: number = 0.5
 
     public constructor() {
         this.position = vec3.fromValues(1.5, this.y, 1.5)
@@ -33,8 +33,12 @@ export class Player {
     }
 
     private updatePosition(labyrinth: Labyrinth, nextX: number, nextZ: number) {
-        if (!labyrinth.isWall(nextX, this.y,  nextZ)) {
+        if (!labyrinth.isWall(nextX, nextZ)) {
             this.position[0] = nextX
+            this.position[2] = nextZ
+        } else if (!labyrinth.isWall(nextX, this.position[2])) {
+            this.position[0] = nextX
+        } else if (!labyrinth.isWall(this.position[0], nextZ)) {
             this.position[2] = nextZ
         }
     }

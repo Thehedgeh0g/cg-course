@@ -1,9 +1,10 @@
 import {Labyrinth} from "./labyrinth";
 import {LabyrinthView} from "./labyrinthView";
 import {Player} from "./player";
-import {mat4, vec3} from "gl-matrix";
+import {mat4} from "gl-matrix";
 import {Cube} from "./cube";
 import {createShaderProgram} from "./webGLUtils";
+import {PlayerControl} from "./playerControl.ts";
 
 class Application {
     private canvas: HTMLCanvasElement
@@ -11,20 +12,28 @@ class Application {
     private program: WebGLProgram
     private labyrinth: Labyrinth
     private vLabyrinth: LabyrinthView
-    private player: Player
+    private playerControls: PlayerControl
     private cube: Cube
 
-    private keysUp: { [key: string]: boolean } = {}
     private lastTime: number = 0
 
     constructor() {
+        const texturePaths = [
+            '../textures/stone.jpg',
+            '../textures/brick.jpg',
+            '../textures/bad.jpg',
+            '../textures/concrete.jpg'
+        ];
+
         this.canvas = document.createElement('canvas')
+        window.addEventListener('resize', this.resizeCanvas)
         document.body.appendChild(this.canvas)
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
         const gl = this.canvas.getContext('webgl')
         if (!gl) throw new Error('WebGL не поддерживается')
         this.gl = gl
+
 
         this.program = createShaderProgram(gl)
         gl.useProgram(this.program)
@@ -33,11 +42,13 @@ class Application {
         const textureLoc = gl.getUniformLocation(this.program, 'u_texture')
         if (!matrixLoc || !textureLoc) throw new Error('Не удалось получить uniform-переменные')
 
-        this.labyrinth = new Labyrinth(null)
-        this.player = new Player()
-        this.vLabyrinth = new LabyrinthView(this.labyrinth, this.gl, matrixLoc, textureLoc)
+        const uColorLocation = gl.getUniformLocation(this.program, 'u_color')
+        gl.uniform4fv(uColorLocation, [1, 1, 1, 1]);
+
+        this.labyrinth = new Labyrinth(texturePaths.length)
+        this.playerControls = new PlayerControl(new Player(), this.labyrinth)
+        this.vLabyrinth = new LabyrinthView(this.labyrinth, texturePaths, this.gl, matrixLoc, textureLoc)
         this.cube = new Cube(this.gl, this.program)
-        this.setupEventListeners()
     }
 
     run() {
@@ -52,52 +63,18 @@ class Application {
         this.gl.clearColor(0.3, 0.3, 1, 1)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT)
 
-        this.updatePlayer(deltaTime)
+        this.playerControls.updatePlayer(deltaTime)
 
         const projectionMatrix = this.calcProjectionMatrix()
-        const viewMatrix =  this.calcViewMatrix()
+        const viewMatrix = this.playerControls.calcPlayerViewMatrix()
+
         this.vLabyrinth.draw(this.cube.getIndicesCount(), projectionMatrix, viewMatrix)
-    }
-
-    private updatePlayer(deltaTime: number) {
-        if (this.keysUp['w']) {
-            this.player.moveForward(this.labyrinth, deltaTime)
-        }
-        if (this.keysUp['s']) {
-            this.player.moveForward(this.labyrinth, -deltaTime)
-        }
-        if (this.keysUp['ArrowLeft']) {
-            this.player.rotate(-deltaTime)
-        }
-        if (this.keysUp['ArrowRight']) {
-            this.player.rotate(deltaTime)
-        }
-        if (this.keysUp['ArrowUp']) {
-            this.player.setPitch(deltaTime * this.player.rotationSpeed)
-        }
-        if (this.keysUp['ArrowDown']) {
-            this.player.setPitch(-(deltaTime * this.player.rotationSpeed))
-        }
-    }
-
-    private setupEventListeners() {
-        window.addEventListener('resize', this.resizeCanvas)
-        window.addEventListener('keydown', this.handleKeyDown)
-        window.addEventListener('keyup', this.handleKeyUp)
     }
 
     private resizeCanvas = () => {
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
         this.gl.viewport(0, 0, window.innerWidth, window.innerHeight)
-    }
-
-    private handleKeyDown = (event: KeyboardEvent) => {
-        this.keysUp[event.key] = true
-    }
-
-    private handleKeyUp = (event: KeyboardEvent) => {
-        this.keysUp[event.key] = false
     }
 
     private calcProjectionMatrix() {
@@ -109,26 +86,6 @@ class Application {
         mat4.perspective(projectionMatrix, fov, aspect, near, far)
 
         return projectionMatrix
-    }
-
-    private calcViewMatrix() {
-        const viewMatrix = mat4.create();
-        const eye = vec3.fromValues(
-            this.player.position[0],
-            this.player.position[1],
-            this.player.position[2]
-        );
-
-        const center = vec3.fromValues(
-            eye[0] + Math.cos(this.player.direction) * Math.cos(this.player.pitch),
-            eye[1] + Math.sin(this.player.pitch),
-            eye[2] + Math.sin(this.player.direction) * Math.cos(this.player.pitch)
-        );
-
-        const up = vec3.fromValues(0, 1, 0);
-        mat4.lookAt(viewMatrix, eye, center, up);
-
-        return viewMatrix;
     }
 }
 

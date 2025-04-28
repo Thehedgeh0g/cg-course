@@ -49,37 +49,37 @@ export const createShaderProgram = (gl: WebGLRenderingContext): WebGLProgram => 
         const err = gl.getProgramInfoLog(program)
         throw new Error('Ошибка линковки программы: ' + err)
     }
+
     return program
 }
 
-export const loadTexture = (
-    gl: WebGLRenderingContext,
-    url: string,
-    callback: (texture: WebGLTexture) => void
-): WebGLTexture => {
-    const texture = gl.createTexture();
-    if (!texture) throw new Error('Не удалось создать текстуру');
+export const loadTextureAsync = (gl: WebGLRenderingContext, url: string): Promise<WebGLTexture> => {
+    return new Promise((resolve, reject) => {
+        const texture = gl.createTexture();
+        if (!texture) return reject(new Error('Не удалось создать текстуру'));
 
-    const image = new Image();
-    image.crossOrigin = "anonymous";
+        const image = new Image();
+        image.crossOrigin = "anonymous";
 
-    image.onload = () => {
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        image.onload = () => {
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
-        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-            gl.generateMipmap(gl.TEXTURE_2D);
-        } else {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        }
+            if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
+                gl.generateMipmap(gl.TEXTURE_2D);
+            } else {
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            }
 
-        callback(texture);
-    };
+            resolve(texture);
+        };
 
-    image.src = url;
-    return texture;
+        image.onerror = () => reject(new Error(`Не удалось загрузить изображение: ${url}`));
+
+        image.src = url;
+    });
 };
 
 const compileShader = (gl: WebGLRenderingContext, type: number, source: string): WebGLShader => {
