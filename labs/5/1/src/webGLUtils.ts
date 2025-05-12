@@ -4,7 +4,7 @@ const vertexShaderSource = `
     
     varying vec2 v_texcoord;
     uniform mat4 u_matrix;
-    
+    // varying, uniform, atribute отличия, побаловаться с фильтрацией текстур
     void main() {
         // Всегда добавляйте .0 к целым числам в GLSL
         gl_Position = u_matrix * vec4(a_position, 1.0);

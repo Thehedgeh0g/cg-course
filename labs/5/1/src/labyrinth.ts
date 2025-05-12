@@ -1,3 +1,5 @@
+// TODO от значения в map долен зависеть тип стены
+
 export class Labyrinth {
     private wallHeigth: number = 1
     private size: number

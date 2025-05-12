@@ -9,11 +9,11 @@ void main() {
               (1.0 + 0.1 * cos(24.0 * x)) * 
               (0.5 + 0.05 * cos(140.0 * x));
               
-    float newX = R * cos(x) * 0.7;
-    float newY = R * sin(x) * 0.7;
+    float newX = R * cos(x+(3.14 * 0.5)) * 0.7;
+    float newY = R * sin(x+(3.14 * 0.5)) * 0.7;
     
     // Корректируем на соотношение сторон
-    gl_Position = vec4(newX / u_aspect, newY-0.8, 0.0, 1.0);
+    gl_Position = vec4(newX / u_aspect, newY-0.2, 0.0, 1.0);
 }
 `;
 
